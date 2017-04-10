@@ -25,11 +25,11 @@ The IP address, PSK and MAC address need to be entered in the Domoticz hardware 
 
 ### Instructions to add the plugin to Domoticz:
 See https://www.domoticz.com/wiki/Using_Python_plugins.
-* place the .py files from this gitbub in domoticz/plugins/sony/
+* Place the .py files from this gitbub in domoticz/plugins/sony/
 
-* give the file execute permissions
+* Give the file execute permissions (chmod +x plugin.py)
 
-* restart the Domoticz service
+* Restart the Domoticz service
 
 * Setup / Hardware / Add a device
 
