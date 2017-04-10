@@ -34,9 +34,9 @@ See https://www.domoticz.com/wiki/Using_Python_plugins.
 
 * Give the file execute permissions (chmod +x plugin.py)
 
-* Restart the Domoticz service
+* Restart the Domoticz service (sudo service domoticz.sh restart)
 
-* Setup / Hardware / Add a device
+* Go to Setup / Hardware / and add a device in Domoticz
 
 * You should now see a new option in the drop-down list of device types called Sony Bravia TV
 
