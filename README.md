@@ -7,7 +7,7 @@ This plugin uses the Sony Bravia RC API by Antonio Parraga Navarro https://githu
 The plugin will show information from your Sony Bravia TV in Domoticz.
 It will work on Sony Bravia models 2013 and newer. Not tested on Sony Bravia with Android yet (that will probably need simple IP control)!
 
-**Information on the TV channel and program are only showed when you use the built-in TV tuner.**
+**Information on the TV channel and program are only showed when you use the built-in TV tuner. Otherwise for example HDMI1 will be shown.**
 
 **The volume slides shows the volume of the built-in speakers. If you have an amplifier attached to your TV, that volume is not shown.**
 *You can use the on/off button of the slider though to mute/unmute the TV, also if you have the TV connected to an amplifier.*
