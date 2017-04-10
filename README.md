@@ -23,6 +23,20 @@ Works with Pre-Shared Key (PSK). The default PSK you can use is 'sony', but you 
 
 The IP address, PSK and MAC address need to be entered in the Domoticz hardware page, see screenshot below.
 
+### Instructions to add the plugin to Domoticz:
+See https://www.domoticz.com/wiki/Using_Python_plugins.
+* place the .py files from this gitbub in domoticz/plugins/sony/
+
+* give the file execute permissions
+
+* restart the Domoticz service
+
+* Setup / Hardware / Add a device
+
+* You should now see a new option in the drop-down list of device types called Sony Bravia TV
+
+### Screenshots
+
 ![sony_tv](https://cloud.githubusercontent.com/assets/11230573/24884147/6fc63ec8-1e48-11e7-95aa-0020bcf6b666.png)
 
 ![sony_tv_vol](https://cloud.githubusercontent.com/assets/11230573/24884199/a0c53394-1e48-11e7-8d2f-2b4c0d417173.png)
