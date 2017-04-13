@@ -2,6 +2,7 @@
 Domoticz Python plugin for Sony Bravia TV
 
 This plugin uses the Sony Bravia RC API by Antonio Parraga Navarro https://github.com/aparraga/braviarc.
+Also a lot of inspiration came from this post by StefanPuntNL http://www.domoticz.com/forum/viewtopic.php?f=61&t=8301.
 
 ## Information
 The plugin will show information from your Sony Bravia TV in Domoticz.
@@ -56,3 +57,5 @@ See https://www.domoticz.com/wiki/Using_Python_plugins.
 * KDL-42W705B
 
 * KDL-42W805A (with the use of cookies)
+
+* X8509C Android
