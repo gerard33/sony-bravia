@@ -49,3 +49,10 @@ See https://www.domoticz.com/wiki/Using_Python_plugins.
 ![sony_tv_sources](https://cloud.githubusercontent.com/assets/11230573/24884202/a23478e8-1e48-11e7-85a4-51d0ef3a3e32.png)
 
 ![sony_tv_plugin_hardware](https://cloud.githubusercontent.com/assets/11230573/24884146/6fc5ce16-1e48-11e7-8d9a-ca7d4db8a7b8.png)
+
+## Confirmed working on the following TV´s
+* KDL-50W829B
+
+* KDL-42W705B
+
+* KDL-42W805A (with the use of cookies)
