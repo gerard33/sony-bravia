@@ -62,7 +62,7 @@ class BasePlugin:
         
         _tv = BraviaRC(Parameters["Address"], Parameters["Mode1"], Parameters["Mode2"]) #IP, PSK, MAC
         
-        Options =   {   "LevelActions"  :"||||" , 
+        Options =   {   "LevelActions"  :"|||||" , 
                         "LevelNames"    :"Off|TV|HDMI1|HDMI2|HDMI3|HDMI4" ,
                         "LevelOffHidden":"true",
                         "SelectorStyle" :"0"
