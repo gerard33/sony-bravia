@@ -4,6 +4,11 @@ Domoticz Python plugin for Sony Bravia TV
 This plugin uses the Sony Bravia RC API by Antonio Parraga Navarro https://github.com/aparraga/braviarc.
 Also a lot of inspiration came from this post by StefanPuntNL http://www.domoticz.com/forum/viewtopic.php?f=61&t=8301.
 
+## Table of Contents
+- [Information](#information)
+- [Sony Bravia plugin instructions](#sony-bravia-plugin-instructions)
+  - [Prerequisites](#prerequisites)
+
 ## Information
 The plugin will show information from your Sony Bravia TV in Domoticz.
 It will work on Sony Bravia models 2013 and newer. Not tested on Sony Bravia with Android yet (that will probably need simple IP control)!
