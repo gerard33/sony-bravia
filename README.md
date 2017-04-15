@@ -16,7 +16,7 @@ Also a lot of inspiration came from this [post](http://www.domoticz.com/forum/vi
 ## Information
 The plugin will show information from your Sony Bravia TV in Domoticz.
 It will work on Sony Bravia models 2013 and newer. Also tested on Sony Bravia X8509C with Android.
-(Although not sure yet it will work on all Android TV's, maybe that needs simple IP control.)
+(Although not sure yet it will work on all Android TV's, maybe some models need simple IP control.)
 
 **Information on the TV channel and program are only showed when you use the built-in TV tuner. Otherwise for example HDMI1 will be shown.**
 
@@ -77,8 +77,8 @@ Make sure you enter all the required fields.
 ![sony_tv_plugin_hardware](https://cloud.githubusercontent.com/assets/11230573/24884146/6fc5ce16-1e48-11e7-8d9a-ca7d4db8a7b8.png)
 
 ## Testing the plugin
-To local test there is a `localtest.py` script that can be run from the command line.
-Make sure you enter the IP address and PSK of your TV in `localtest.py`.
+To do some easy testing with the plugin there is a `localtest.py` script that can be run from the command line.
+Make sure you enter the IP address and PSK of your TV in `localtest.py` before executing it.
 After that you can check if your TV works with the plugin.
 
 ```bash
