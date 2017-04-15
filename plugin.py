@@ -1,9 +1,9 @@
-#
+#       
 #       Sony Bravia Plugin
 #       Author: G3rard, 2017
-#
+#       
 """
-<plugin key="sony" name="Sony Bravia TV" author="G3rard" version="0.2" wikilink="http://www.domoticz.com/wiki" externallink="https://www.sony.com/electronics/bravia">
+<plugin key="sony" name="Sony Bravia TV" author="G3rard" version="0.3" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
     <description>
 Sony Bravia plugin.<br/><br/>
 It will work on Sony Bravia models 2013 and newer. Not tested on Sony Bravia with Android yet!<br/>
@@ -11,12 +11,12 @@ Works with pre-shared key.<br/><br/>
 Prerequisites:<br/>
 * Enable remote start on your TV: [Settings] => [Network] => [Home Network Setup] => [Remote Start] => [On]<br/>
 * Enable pre-shared key on your TV: [Settings] => [Network] => [Home Network Setup] => [IP Control] => [Authentication] => [Normal and Pre-Shared Key]<br/>
-* Set pre-shared key on your TV: [Settings] => [Network] => [Home Network Setup] => [IP Control] => [Pre-Shared Key] => [sony]<br/>
+* Set pre-shared key on your TV: [Settings] => [Network] => [Home Network Setup] => [IP Control] => [Pre-Shared Key] => sony<br/>
 * Give your TV a static IP address, or make a DHCP reservation for a specific IP address in your router.<br/>
 * Determine the MAC address of your TV: [Settings] => [Network] => [Network Setup] => [View Network Status]<br/>
     </description>
     <params>
-        <param field="Address" label="IP Address" width="200px" required="true" default="192.168.1.191"/>
+        <param field="Address" label="IP address" width="200px" required="true" default="192.168.1.191"/>
         <param field="Mode1" label="Pre-shared key (PSK)" width="200px" required="true" default="sony"/>
         <param field="Mode2" label="MAC address" width="200px" required="true" default="AA:BB:CC:DD:EE:FF"/>
         <param field="Mode3" label="Volume bar" width="75px">
@@ -25,7 +25,6 @@ Prerequisites:<br/>
                 <option label="False" value="Fixed" default="true" />
             </options>
         </param>
-        <param field="Mode4" label="Timeout (sec)" width="30px" required="true" default="10"/>
         <param field="Mode5" label="Update interval (sec)" width="30px" required="true" default="30"/>
         <param field="Mode6" label="Debug" width="75px">
             <options>
@@ -53,7 +52,7 @@ class BasePlugin:
     perc_playingTime = 0
     _tv = None
     
-    # Executed once at HW creation/ update. Can create up to 255 devices.
+    # Executed once at reboot/update, can create up to 255 devices
     def onStart(self):
         global _tv
         
@@ -88,15 +87,19 @@ class BasePlugin:
             if (3 in Devices):
                 self.tvSource = Devices[3].nValue
         
-        if int(Parameters["Mode5"]) < 30:
-            Domoticz.Log("Update interval set to " + Parameters["Mode5"])
-            Domoticz.Heartbeat(int(Parameters["Mode5"]))
+        # Set update interval, values below 10 seconds are not allowed due to timeout of 5 seconds in bravia.py script
+        updateInterval = int(Parameters["Mode5"])
+        if updateInterval < 30:
+            if updateInterval < 10:
+                updateInterval == 10
+            Domoticz.Log("Update interval set to " + str(updateInterval) + " (minimum is 10 seconds)")
+            Domoticz.Heartbeat(updateInterval)
         else:
             Domoticz.Heartbeat(30)
         
         DumpConfigToLog()
 
-        return #GZ of return True
+        return #--> return True
 
     def onConnect(self, Status, Description):
         if (Status == 0):
@@ -110,12 +113,12 @@ class BasePlugin:
             self.SyncDevices()
         return
     
-    # called when a single,complete message is received from the external hardware
+    # Called when a single,complete message is received from the external hardware
     def onMessage(self, Data, Status, Extra):
         Domoticz.Log('onMessage: '+str(Data)+" ,"+str(Status)+" ,"+str(Extra))    
         return True
     
-    # executed each time we click on device through Domoticz GUI
+    # Executed each time we click on device through Domoticz GUI
     def onCommand(self, Unit, Command, Level, Hue):
         Domoticz.Log("onCommand called for Unit " + str(Unit) + ": Parameter '" + str(Command) + "', Level: " + str(Level))
 
@@ -131,6 +134,9 @@ class BasePlugin:
                         Domoticz.Error("TV can not be turned on as there is no MAC address configured")
                     else:
                         _tv.turn_on()
+                        self.tvPlaying = "TV starting" # Show that the TV is starting, as booting the TV takes some time
+                        #self.tvSource = "10"
+                        self.SyncDevices()
         else:
             if Unit == 1:     # TV power switch
                 if action == "Off":
@@ -140,8 +146,8 @@ class BasePlugin:
                     self.SyncDevices()
                 
             if Unit == 2:     # TV volume
-                if action == 'Set': #and (params.capitalize() == 'Level') or (Command.lower() == 'Volume')
-                    self.tvVolume = Level
+                if action == 'Set': #--> and (params.capitalize() == 'Level') or (Command.lower() == 'Volume')
+                    self.tvVolume = str(Level)
                     _tv.set_volume_level(self.tvVolume)
                 elif action == "Off":
                     _tv.mute_volume()
@@ -157,7 +163,7 @@ class BasePlugin:
                         self.GetTVInfo()
                     if Level == 20:
                         _tv.send_req_ircc("AAAAAgAAABoAAABaAw==") #HDMI1
-                        self.tvPlaying = "HDMI 1/MHL"
+                        self.tvPlaying = "HDMI 1"
                         self.tvSource = "20"
                         self.SyncDevices()
                     if Level == 30:
@@ -183,12 +189,12 @@ class BasePlugin:
         Domoticz.Log("Sony Bravia TV has disconnected.")
         return
         
-    # executed once when HW updated/removed
+    # Executed once when HW updated/removed
     def onStop():
         Domoticz.Log("onStop called")
         return True
     
-    # execution depend of Domoticz.Heartbeat(x) x in seconds
+    # Execution depend of Domoticz.Heartbeat(x) x in seconds
     def onHeartbeat(self):
         try:
             tvStatus = _tv.get_power_status()
@@ -200,7 +206,6 @@ class BasePlugin:
         if tvStatus == 'active':
             self.powerOn = True
             self.GetTVInfo()
-            
         else:
             self.powerOn = False
             self.SyncDevices()
@@ -208,51 +213,58 @@ class BasePlugin:
         return
 
     def SyncDevices(self):
-        if (self.powerOn == False):
-            UpdateDevice(1, 0, 'Off')
-            if Parameters["Mode3"] == "Volume":
-                UpdateDevice(2, 0, str(self.tvVolume))
-            UpdateDevice(3, 0, "0") #GZ nog uitzoeken
+        if self.powerOn == False:
+            if self.tvPlaying == "TV starting":         # TV is booting and not yet responding to get_power_status
+                UpdateDevice(1, 1, self.tvPlaying)
+                #UpdateDevice(3, 1, self.tvSource)
+            else:                                       # TV is off so set devices to off
+                UpdateDevice(1, 0, "Off")
+                if Parameters["Mode3"] == "Volume":
+                    UpdateDevice(2, 0, str(self.tvVolume))
+                UpdateDevice(3, 0, "0")
         else:
-            UpdateDevice(1, 1, self.tvPlaying)
-            if Parameters["Mode3"] == "Volume":
-                UpdateDevice(2, 2, str(self.tvVolume))
-            UpdateDevice(3, 1, self.tvSource)
+            if self.tvPlaying == "Off":                 # TV is set to off in Domoticz, but self.powerOn is still true
+                UpdateDevice(1, 0, self.tvPlaying)
+                if Parameters["Mode3"] == "Volume":
+                    UpdateDevice(2, 0, str(self.tvVolume))
+                UpdateDevice(3, 0, self.tvSource)
+            else:                                       # TV is on so set devices to on
+                UpdateDevice(1, 1, self.tvPlaying)
+                if Parameters["Mode3"] == "Volume":
+                    UpdateDevice(2, 2, str(self.tvVolume))
+                UpdateDevice(3, 1, self.tvSource)
 
         return
     
     def GetTVInfo(self):
         self.tvPlaying = _tv.get_playing_info()
-        if not self.tvPlaying:  #dict is empty
-            Domoticz.Debug('No information from TV received (maybe TV is paused)')
+        if not self.tvPlaying:  # Dict is empty
+            Domoticz.Debug("No information from TV received (maybe TV is paused)")
         else:
-            if self.tvPlaying['programTitle'] != None:  #get information on channel and programtitle if tuner of TV is used
-                
-                #GZ nog uitzoeken
-                #Domoticz.Log(str(self.tvPlaying['startDateTime']))
-                #Domoticz.Log(str(self.tvPlaying['durationSec']))
-                #self.startTime, self.endTime, self.perc_playingTime = _tv.playing_time(str(self.tvPlaying['startDateTime']), int(self.tvPlaying['durationSec']))
-                #self.perc_playingTime = _tv.playing_time(self.tvPlaying['startDateTime'], self.tvPlaying['durationSec'])
-                #self.tvPlaying = (self.tvPlaying['title'] + ' - ' + self.tvPlaying['programTitle'] + ' [' + self.startTime + ' - ' + self.endTime +']')
-                #Domoticz.Debug(self.startTime, '-', self.endTime, '[' + str(self.perc_playingTime) + '%]')
-                #GZ nog uitzoeken
-                
-                self.tvPlaying = str((self.tvPlaying['title'] + ' - ' + self.tvPlaying['programTitle']))
+            if self.tvPlaying['programTitle'] != None:      # Get information on channel and program title if tuner of TV is used
+                if self.tvPlaying['startDateTime'] != None: # Show start time and end time of program
+                    self.startTime, self.endTime, self.perc_playingTime = _tv.playing_time(self.tvPlaying['startDateTime'], self.tvPlaying['durationSec'])
+                    self.tvPlaying = (self.tvPlaying['title'] + ' - ' + self.tvPlaying['programTitle'] + ' [' + str(self.startTime) + ' - ' + str(self.endTime) +']')
+                    Domoticz.Debug("Program information: " + str(self.startTime) + "-" + str(self.endTime) + " [" + str(self.perc_playingTime) + "%]")
+                else:
+                    self.tvPlaying = str((self.tvPlaying['title'] + ' - ' + self.tvPlaying['programTitle']))
                 UpdateDevice(1, 1, self.tvPlaying)
-                UpdateDevice(3, 1, "10")    #set source device to TV
-            else:
+                UpdateDevice(3, 1, "10")        # Set source device to TV
+            else:                               # No program info found
                 self.tvPlaying = self.tvPlaying['title']
+                if "/MHL" in self.tvPlaying:    # Source contains /MHL, that can be removed
+                    self.tvPlaying = self.tvPlaying.replace("/MHL", "")
                 UpdateDevice(1, 1, self.tvPlaying)
-                if self.tvPlaying == "HDMI 1/MHL":
-                    UpdateDevice(3, 1, "20")    #set source device to HDMI1
-                elif self.tvPlaying == "HDMI 2":
-                    UpdateDevice(3, 1, "30")    #set source device to HDMI2
-                elif self.tvPlaying == "HDMI 3":
-                    UpdateDevice(3, 1, "40")    #set source device to HDMI3
-                elif self.tvPlaying == "HDMI 4":
-                    UpdateDevice(3, 1, "50")    #set source device to HDMI4
+                if "HDMI 1" in self.tvPlaying:
+                    UpdateDevice(3, 1, "20")    # Set source device to HDMI1
+                elif "HDMI 2" in self.tvPlaying:
+                    UpdateDevice(3, 1, "30")    # Set source device to HDMI2
+                elif "HDMI 3" in self.tvPlaying:
+                    UpdateDevice(3, 1, "40")    # Set source device to HDMI3
+                elif "HDMI 4" in self.tvPlaying:
+                    UpdateDevice(3, 1, "50")    # Set source device to HDMI4
             
-            #get volume information of TV
+            # Get volume information of TV
             if Parameters["Mode3"] == "Volume":
                 self.tvVolume = _tv.get_volume_info()
                 self.tvVolume = self.tvVolume['volume']
@@ -279,7 +291,7 @@ def onDisconnect():
 def onHeartbeat():
     _plugin.onHeartbeat()
 
-# Update Device into DB
+# Update Device into database
 def UpdateDevice(Unit, nValue, sValue, AlwaysUpdate=False):
     # Make sure that the Domoticz device still exists (they can be deleted) before updating it 
     if (Unit in Devices):
