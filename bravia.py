@@ -28,19 +28,17 @@ from datetime import datetime
 import time
 import sys
 
-date_format = "%Y-%m-%dT%H:%M:%S"
-
-TIMEOUT = 5
+TIMEOUT = 5 # timeout in seconds
 
 class BraviaRC:
 
     def __init__(self, host, psk, mac=None):  # mac address is optional but necessary if we want to turn on the TV
-        #Initialize the Sony Bravia RC class.
+        """Initialize the Sony Bravia RC class."""
 
         self._host = host
         self._psk = psk
         self._mac = mac
-        self._cookies = None            #GZ nog verwijderen, want gebruik PSK en niet cookie?
+        self._cookies = None
         self._commands = []
 
     def _jdata_build(self, method, params):
@@ -50,8 +48,21 @@ class BraviaRC:
             ret = json.dumps({"method": method, "params": [], "id": 1, "version": "1.0"})
         return ret
 
-    #GZ onderstaande functie niet nodig, want gebruik PSK en niet cookie?
     def connect(self, pin, clientid, nickname):
+        """Connect to TV and get authentication cookie.
+        Parameters
+        ---------
+        pin: str
+            Pin code show by TV (or 0000 to get Pin Code).
+        clientid: str
+            Client ID.
+        nickname: str
+            Client human friendly name.
+        Returns
+        -------
+        bool
+            True if connected.
+        """
         authorization = json.dumps(
             {"method": "actRegister",
              "params": [{"clientid": clientid,
@@ -95,7 +106,7 @@ class BraviaRC:
 
         return False
         
-    def is_connected(self):         #GZ nog verwijderen, want gebruik PSK en niet cookie?
+    def is_connected(self):
         if self._cookies is None:
             return False
         else:
@@ -117,7 +128,7 @@ class BraviaRC:
             socket_instance.close()
 
     def send_req_ircc(self, params, log_errors=True):
-        #Send an IRCC command via HTTP to Sony Bravia.
+        """Send an IRCC command via HTTP to Sony Bravia."""
         headers = {'X-Auth-PSK': self._psk, 'SOAPACTION': '"urn:schemas-sony-com:service:IRCC:1#X_SendIRCC"'}
         data = ("<?xml version=\"1.0\"?><s:Envelope xmlns:s=\"http://schemas.xmlsoap.org" +
                 "/soap/envelope/\" " +
@@ -145,7 +156,7 @@ class BraviaRC:
             return response
 
     def bravia_req_json(self, url, params, log_errors=True):
-        #Send request command via HTTP json to Sony Bravia.
+        """Send request command via HTTP json to Sony Bravia."""
         try:
             req = urllib.request.Request(url='http://'+self._host+'/'+url,
                                          data=params.encode("UTF-8"),
@@ -170,11 +181,11 @@ class BraviaRC:
             return html
 
     def send_command(self, command):
-        #Sends a command to the TV.
+        """Sends a command to the TV."""
         self.send_req_ircc(self.get_command_code(command))
 
     def get_source(self, source):
-        #Returns list of Sources.
+        """Returns list of Sources."""
         original_content_list = []
         content_index = 0
         while True:
@@ -191,7 +202,7 @@ class BraviaRC:
         return original_content_list
 
     def load_source_list(self):
-        #Load source list from Sony Bravia.
+        """Load source list from Sony Bravia."""
         original_content_list = []
         resp = self.bravia_req_json("sony/avContent",
                                     self._jdata_build("getSourceList", {"scheme": "tv"}))
@@ -218,6 +229,7 @@ class BraviaRC:
         return return_value
 
     def get_playing_info(self):
+        """Get information on program that is shown on TV."""
         return_value = {}
         resp = self.bravia_req_json("sony/avContent", self._jdata_build("getPlayingContentInfo", None))
         
@@ -234,7 +246,7 @@ class BraviaRC:
         return return_value
 
     def get_power_status(self):
-        #Get power status: off, active, standby.
+        """Get power status: off, active, standby."""
         return_value = 'off' # by default the TV is turned off
         try:
             resp = self.bravia_req_json("sony/system", self._jdata_build("getPowerStatus", None), False)
@@ -261,7 +273,7 @@ class BraviaRC:
         return None
 
     def get_volume_info(self):
-        #Get volume info.
+        """Get volume info."""
         resp = self.bravia_req_json("sony/audio", self._jdata_build("getVolumeInformation", None))
         if not resp.get('error'):
             results = resp.get('result')[0]
@@ -295,76 +307,88 @@ class BraviaRC:
         return return_value
         
     def set_volume_level(self, volume):
-        #Set volume level, range 0..1.
+        """Set volume level, range 0..100."""
         self.bravia_req_json("sony/audio", self._jdata_build("setAudioVolume", {"target": "speaker",
-                                                                                "volume": volume * 100}))
+                                                                                "volume": volume}))
 
     def turn_on(self):
-        #Turn the media player on.
+        """Turn the media player on."""
         self._wakeonlan()
         # Try using the power on command incase the WOL doesn't work
-        #GZ onderstaande uitgezet want dat kan niet na wakeonlan?
+        # --> commented out because it will not work after TV is starting with WOL
         #if self.get_power_status() != 'active':
             #self.send_req_ircc(self.get_command_code('TvPower'))
 
     def turn_off(self):
-        #Turn off media player.
+        """Turn off media player."""
         self.send_req_ircc(self.get_command_code('PowerOff'))
 
     def volume_up(self):
-        #Volume up the media player.
+        """Volume up the media player."""
         self.send_req_ircc(self.get_command_code('VolumeUp'))
 
     def volume_down(self):
-        #Volume down media player.
+        """Volume down media player."""
         self.send_req_ircc(self.get_command_code('VolumeDown'))
 
-    #GZ def mute_volume(self, mute):
-    def mute_volume(self):
-        #Send mute command.
+    def mute_volume(self): #--> def mute_volume(self, mute):
+        """Send mute command."""
         self.send_req_ircc(self.get_command_code('Mute'))
 
     def select_source(self, source):
-        #Set the input source.
+        """Set the input source."""
         if source in self._content_mapping:
             uri = self._content_mapping[source]
             self.play_content(uri)
 
     def play_content(self, uri):
-        #Play content by URI.
+        """Play content by URI."""
         self.bravia_req_json("sony/avContent", self._jdata_build("setPlayContent", {"uri": uri}))
 
     def media_play(self):
-        #Send play command.
+        """Send play command."""
         self.send_req_ircc(self.get_command_code('Play'))
 
     def media_pause(self):
-        #Send media pause command to media player.
+        """Send media pause command to media player."""
         self.send_req_ircc(self.get_command_code('Pause'))
 
     def media_next_track(self):
-        #Send next track command.
+        """Send next track command."""
         self.send_req_ircc(self.get_command_code('Next'))
 
     def media_previous_track(self):
-        #Send the previous track command.
+        """Send the previous track command."""
         self.send_req_ircc(self.get_command_code('Prev'))
         
     def calc_time(self, *times):
-        #Calculate the sum of times, value is returned in HH:MM.
+        """Calculate the sum of times, value is returned in HH:MM."""
         totalSecs = 0
         for tm in times:
             timeParts = [int(s) for s in tm.split(':')]
             totalSecs += (timeParts[0] * 60 + timeParts[1]) * 60 + timeParts[2]
         totalSecs, sec = divmod(totalSecs, 60)
         hr, min = divmod(totalSecs, 60)
+        if hr == 24: #set 24:10 to 00:10
+            hr = 00
         return ("%02d:%02d" % (hr, min))
     
     def playing_time(self, startDateTime, durationSec):
-        #Give starttime, endtime and percentage played.
+        """Give starttime, endtime and percentage played."""
         #get starttime (2017-03-24T00:00:00+0100) and calculate endtime with duration (secs)
-        playingtime = datetime.now() - datetime.strptime(startDateTime[:-5], date_format)
-        starttime = datetime.time(datetime.strptime(startDateTime[:-5], date_format))
+        date_format = "%Y-%m-%dT%H:%M:%S"
+        try:
+            playingtime = datetime.now() - datetime.strptime(startDateTime[:-5], date_format)
+        except TypeError:
+            #https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+            #playingtime = datetime.now() - datetime.fromtimestamp(time.mktime(time.strptime(startDateTime[:-5], date_format)))
+            playingtime = datetime.now() - datetime(*(time.strptime(startDateTime[:-5], date_format)[0:6]))
+        try:
+            starttime = datetime.time(datetime.strptime(startDateTime[:-5], date_format))
+        except TypeError:
+            #starttime = datetime.time(datetime.fromtimestamp(time.mktime(time.strptime(startDateTime[:-5], date_format))))
+            starttime = datetime.time(datetime(*(time.strptime(startDateTime[:-5], date_format)[0:6])))
+        
         duration = time.strftime('%H:%M:%S', time.gmtime(durationSec))
         endtime = self.calc_time(str(starttime), str(duration))
         starttime = starttime.strftime('%H:%M')
