@@ -57,8 +57,9 @@ sudo service domoticz.sh restart
 **Sony Bravia TV**.
 
 Make sure you enter all the required fields.
+
 | Field | Information|
-| ----- | ---- |
+| ----- | ---------- |
 | IP address | Enter the IP address of your TV (see instructions above how to find the IP address, also make sure it is static) |
 | Pre-shared key | Enter the Pre-shared key here (default is sony) |
 | MAC address | Enter the MAC address of your TV (see instructions above how to find the MAC address) |
