@@ -48,6 +48,12 @@ See this [link](https://www.domoticz.com/wiki/Using_Python_plugins) for more inf
 cd domoticz/plugins
 git clone https://github.com/gerard33/sony-bravia.git
 ```
+  * *When updating to the latest version on Github enter the following commands*
+  ```bash
+  cd domoticz/plugins/sony-bravia
+  git pull
+  ```
+
 * Restart the Domoticz service
 ```bash
 sudo service domoticz.sh restart
@@ -70,13 +76,12 @@ Make sure you enter all the required fields.
 After clicking on the Add button the devices are available in the **Setup - Devices** page, from where the devices can be added to the **Switches** tab.
 
 ## Screenshots
-![sony_tv](https://cloud.githubusercontent.com/assets/11230573/24884147/6fc63ec8-1e48-11e7-95aa-0020bcf6b666.png)
+![tv](https://cloud.githubusercontent.com/assets/11230573/25202175/bc1c9db8-2554-11e7-9a0f-39d182c700f5.png)
+![tv2](https://cloud.githubusercontent.com/assets/11230573/25202176/bc332e0c-2554-11e7-821d-bd76c58f7bf1.png)
 
-![sony_tv_vol](https://cloud.githubusercontent.com/assets/11230573/24884199/a0c53394-1e48-11e7-8d2f-2b4c0d417173.png)
+![tv3](https://cloud.githubusercontent.com/assets/11230573/25202177/bc3f921e-2554-11e7-842c-96c863f210dc.png)
 
-![sony_tv_sources](https://cloud.githubusercontent.com/assets/11230573/24884202/a23478e8-1e48-11e7-85a4-51d0ef3a3e32.png)
-
-![sony_tv_plugin_hardware](https://cloud.githubusercontent.com/assets/11230573/24884146/6fc5ce16-1e48-11e7-8d9a-ca7d4db8a7b8.png)
+![tvhw](https://cloud.githubusercontent.com/assets/11230573/25202178/bcfb2998-2554-11e7-80ec-9b2e85ee59f4.png)
 
 ## Testing the plugin
 To do some easy testing with the plugin there is a `localtest.py` script that can be run from the command line.
