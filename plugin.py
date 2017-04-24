@@ -18,7 +18,7 @@ Prerequisites:<br/>
     <params>
         <param field="Address" label="IP address" width="200px" required="true" default="192.168.1.191"/>
         <param field="Mode1" label="Pre-shared key (PSK)" width="200px" required="true" default="sony"/>
-        <param field="Mode2" label="MAC address" width="200px" required="true" default="FC:F1:52:D8:EB:1F"/>
+        <param field="Mode2" label="MAC address" width="200px" required="true" default="AA:BB:CC:DD:EE:FF"/>
         <param field="Mode3" label="Volume bar" width="75px">
             <options>
                 <option label="True" value="Volume"/>
