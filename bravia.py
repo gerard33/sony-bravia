@@ -312,12 +312,14 @@ class BraviaRC:
                                                                                 "volume": volume}))
 
     def turn_on(self):
-        """Turn the media player on."""
+        """Turn the media player on using WOL."""
         self._wakeonlan()
-        # Try using the power on command incase the WOL doesn't work
-        # --> commented out because it will not work after TV is starting with WOL
-        #if self.get_power_status() != 'active':
+        
+    def turn_on_command(self):
+        """Turn the media player on using command. Only confirmed working on Android, can be used when WOL is not available."""
+        if self.get_power_status() != 'active':
             #self.send_req_ircc(self.get_command_code('TvPower'))
+            self.bravia_req_json("sony/system", self._jdata_build("setPowerStatus", {"status": "true"}))
 
     def turn_off(self):
         """Turn off media player."""
@@ -352,6 +354,14 @@ class BraviaRC:
     def media_pause(self):
         """Send media pause command to media player."""
         self.send_req_ircc(self.get_command_code('Pause'))
+        
+    def media_tv_pause(self):
+        """Send media pause command to TV."""
+        self.send_req_ircc(self.get_command_code('TvPause'))
+        
+    def media_stop(self):
+        """Send stopcommand to media player."""
+        self.send_req_ircc(self.get_command_code('Stop'))
 
     def media_next_track(self):
         """Send next track command."""
@@ -369,8 +379,8 @@ class BraviaRC:
             totalSecs += (timeParts[0] * 60 + timeParts[1]) * 60 + timeParts[2]
         totalSecs, sec = divmod(totalSecs, 60)
         hr, min = divmod(totalSecs, 60)
-        if hr == 24: #set 24:10 to 00:10
-            hr = 00
+        if hr >= 24: #set 24:10 to 00:10
+            hr -= 24
         return ("%02d:%02d" % (hr, min))
     
     def playing_time(self, startDateTime, durationSec):
