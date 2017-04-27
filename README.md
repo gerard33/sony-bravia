@@ -79,6 +79,8 @@ After clicking on the Add button the devices are available in the **Setup - Devi
 ![tv](https://cloud.githubusercontent.com/assets/11230573/25202175/bc1c9db8-2554-11e7-9a0f-39d182c700f5.png)
 ![tv2](https://cloud.githubusercontent.com/assets/11230573/25202176/bc332e0c-2554-11e7-821d-bd76c58f7bf1.png)
 
+![sony_tv_control_channel](https://cloud.githubusercontent.com/assets/11230573/25483849/d0a9b4c4-2b57-11e7-9875-193567029e3b.png)
+
 ![tv3](https://cloud.githubusercontent.com/assets/11230573/25202177/bc3f921e-2554-11e7-842c-96c863f210dc.png)
 
 ![tvhw](https://cloud.githubusercontent.com/assets/11230573/25202178/bcfb2998-2554-11e7-80ec-9b2e85ee59f4.png)
