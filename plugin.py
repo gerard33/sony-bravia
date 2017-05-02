@@ -3,7 +3,7 @@
 #       Author: G3rard, 2017
 #       
 """
-<plugin key="sony" name="Sony Bravia TV" author="G3rard" version="0.4" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
+<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="0.5" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
     <description>
 Sony Bravia plugin.<br/><br/>
 It will work on Sony Bravia models 2013 and newer.<br/>
@@ -61,8 +61,7 @@ class BasePlugin:
     def onStart(self):
         global _tv
         
-        if Parameters["Mode6"] == "Debug":
-            Domoticz.Debugging(1)
+        if Parameters["Mode6"] == "Debug": Domoticz.Debugging(1)
         
         _tv = BraviaRC(Parameters["Address"], Parameters["Mode1"], Parameters["Mode2"]) #IP, PSK, MAC
         
@@ -84,8 +83,7 @@ class BasePlugin:
                                     
         if (len(Devices) == 0):
             Domoticz.Device(Name="Status", Unit=1, Type=17, Image=2, Switchtype=17).Create()
-            if Parameters["Mode3"] == "Volume":
-                Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8).Create()
+            if Parameters["Mode3"] == "Volume": Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8).Create()
             Domoticz.Device(Name="Source", Unit=3, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions3).Create()
             Domoticz.Device(Name="Control", Unit=4, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions4).Create()
             Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5).Create()
@@ -109,22 +107,16 @@ class BasePlugin:
             Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5).Create()
             Domoticz.Log("Channel device created")
         else:
-            if (1 in Devices):
-                self.tvState = Devices[1].nValue    #--> of sValue
-            if (2 in Devices):
-                self.tvVolume = Devices[2].nValue   #--> of sValue
-            if (3 in Devices):
-                self.tvSource = Devices[3].sValue
-            if (4 in Devices):
-                self.tvControl = Devices[4].sValue
-            if (5 in Devices):
-                self.tvChannel = Devices[5].sValue
+            if (1 in Devices): self.tvState = Devices[1].nValue    #--> of sValue
+            if (2 in Devices): self.tvVolume = Devices[2].nValue   #--> of sValue
+            if (3 in Devices): self.tvSource = Devices[3].sValue
+            if (4 in Devices): self.tvControl = Devices[4].sValue
+            if (5 in Devices): self.tvChannel = Devices[5].sValue
         
         # Set update interval, values below 10 seconds are not allowed due to timeout of 5 seconds in bravia.py script
         updateInterval = int(Parameters["Mode5"])
         if updateInterval < 30:
-            if updateInterval < 10:
-                updateInterval == 10
+            if updateInterval < 10: updateInterval == 10
             Domoticz.Log("Update interval set to " + str(updateInterval) + " (minimum is 10 seconds)")
             Domoticz.Heartbeat(updateInterval)
         else:
@@ -188,11 +180,32 @@ class BasePlugin:
                 if action == "Off":
                     _tv.turn_off()
                     self.tvPlaying = "Off"
-                    self.tvSource = 0
-                    self.tvControl = 0
-                    self.tvChannel = 0
                     self.SyncDevices()
-                
+                # Remote buttons (action is capitalized so chosen for Command)
+                elif Command == "ChannelUp": _tv.send_req_ircc("AAAAAQAAAAEAAAAQAw==")       # ChannelUp
+                elif Command == "ChannelDown": _tv.send_req_ircc("AAAAAQAAAAEAAAARAw==")     # ChannelDown
+                elif Command == "Channels": _tv.send_req_ircc("AAAAAgAAABoAAABhAw==")        # PopUpMenu
+                elif Command == "VolumeUp": _tv.send_req_ircc("AAAAAQAAAAEAAAASAw==")        # VolumeUp
+                elif Command == "VolumeDown": _tv.send_req_ircc("AAAAAQAAAAEAAAATAw==")      # VolumeDown
+                elif Command == "Mute": _tv.send_req_ircc("AAAAAQAAAAEAAAAUAw==")            # Mute
+                elif Command == "Select": _tv.send_req_ircc("AAAAAQAAAAEAAABlAw==")          # Confirm
+                elif Command == "Up": _tv.send_req_ircc("AAAAAQAAAAEAAAB0Aw==")              # Up
+                elif Command == "Down": _tv.send_req_ircc("AAAAAQAAAAEAAAB1Aw==")            # Down
+                elif Command == "Left": _tv.send_req_ircc("AAAAAQAAAAEAAAA0Aw==")            # Left
+                elif Command == "Right": _tv.send_req_ircc("AAAAAQAAAAEAAAAzAw==")           # Right
+                elif Command == "Home": _tv.send_req_ircc("AAAAAQAAAAEAAABgAw==")            # Home
+                elif Command == "Info": _tv.send_req_ircc("AAAAAgAAAKQAAABbAw==")            # EPG
+                elif Command == "Back": _tv.send_req_ircc("AAAAAgAAAJcAAAAjAw==")            # Return
+                elif Command == "ContextMenu": _tv.send_req_ircc("AAAAAgAAAJcAAAA2Aw==")     # Options
+                elif Command == "FullScreen": _tv.send_req_ircc("AAAAAQAAAAEAAABjAw==")      # Exit
+                elif Command == "ShowSubtitles": _tv.send_req_ircc("AAAAAQAAAAEAAAAlAw==")   # Input
+                elif Command == "Stop": _tv.send_req_ircc("AAAAAgAAAJcAAAAYAw==")            # Stop
+                elif Command == "BigStepBack": _tv.send_req_ircc("AAAAAgAAAJcAAAAZAw==")     # Pause
+                elif Command == "Rewind": _tv.send_req_ircc("AAAAAgAAAJcAAAAbAw==")          # Rewind
+                elif Command == "PlayPause": _tv.send_req_ircc("AAAAAgAAABoAAABnAw==")       # TV pause
+                elif Command == "FastForward": _tv.send_req_ircc("AAAAAgAAAJcAAAAcAw==")     # Forward
+                elif Command == "BigStepForward": _tv.send_req_ircc("AAAAAgAAAJcAAAAaAw==")  # Play
+                    
             if Unit == 2:     # TV volume
                 if action == 'Set': #--> and (params.capitalize() == 'Level') or (Command.lower() == 'Volume')
                     self.tvVolume = str(Level)
@@ -229,40 +242,26 @@ class BasePlugin:
                         
             if Unit == 4:   # TV control
                 if Command == 'Set Level':
-                    if Level == 10:
-                        _tv.send_req_ircc("AAAAAgAAAJcAAAAaAw==") #Play
-                    if Level == 20:
-                        _tv.send_req_ircc("AAAAAgAAAJcAAAAYAw==") #Stop
-                    if Level == 30:
-                        _tv.send_req_ircc("AAAAAgAAAJcAAAAZAw==") #Pause
-                    if Level == 40:
-                        _tv.send_req_ircc("AAAAAgAAABoAAABnAw==") #Pause TV
-                    if Level == 50:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAABjAw==") #Exit
+                    if Level == 10: _tv.send_req_ircc("AAAAAgAAAJcAAAAaAw==") #Play
+                    if Level == 20: _tv.send_req_ircc("AAAAAgAAAJcAAAAYAw==") #Stop
+                    if Level == 30: _tv.send_req_ircc("AAAAAgAAAJcAAAAZAw==") #Pause
+                    if Level == 40: _tv.send_req_ircc("AAAAAgAAABoAAABnAw==") #Pause TV
+                    if Level == 50: _tv.send_req_ircc("AAAAAQAAAAEAAABjAw==") #Exit
                     self.tvControl = Level
                     self.SyncDevices()
             
             if Unit == 5:   # TV channels
                 if Command == 'Set Level':
                     # Level 10 = --Choose a channel--
-                    if Level == 20:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAAAAw==") #1
-                    if Level == 30:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAABAw==") #2
-                    if Level == 40:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAACAw==") #3
-                    if Level == 50:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAADAw==") #4
-                    if Level == 60:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAAEAw==") #5
-                    if Level == 70:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAAFAw==") #6
-                    if Level == 80:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAAGAw==") #7
-                    if Level == 90:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAAHAw==") #8
-                    if Level == 100:
-                        _tv.send_req_ircc("AAAAAQAAAAEAAAAIAw==") #9
+                    if Level == 20: _tv.send_req_ircc("AAAAAQAAAAEAAAAAAw==") #1
+                    if Level == 30: _tv.send_req_ircc("AAAAAQAAAAEAAAABAw==") #2
+                    if Level == 40: _tv.send_req_ircc("AAAAAQAAAAEAAAACAw==") #3
+                    if Level == 50: _tv.send_req_ircc("AAAAAQAAAAEAAAADAw==") #4
+                    if Level == 60: _tv.send_req_ircc("AAAAAQAAAAEAAAAEAw==") #5
+                    if Level == 70: _tv.send_req_ircc("AAAAAQAAAAEAAAAFAw==") #6
+                    if Level == 80: _tv.send_req_ircc("AAAAAQAAAAEAAAAGAw==") #7
+                    if Level == 90: _tv.send_req_ircc("AAAAAQAAAAEAAAAHAw==") #8
+                    if Level == 100: _tv.send_req_ircc("AAAAAQAAAAEAAAAIAw==") #9
                     self.tvChannel = Level
                     self.SyncDevices()
         
@@ -289,6 +288,8 @@ class BasePlugin:
 
         if tvStatus == 'active':    # TV is on
             self.powerOn = True
+            #-> to do
+            #if self.tvPlaying != "Off":
             self.GetTVInfo()
         else:                       # TV is off or standby
             self.powerOn = False
@@ -303,39 +304,34 @@ class BasePlugin:
                 UpdateDevice(1, 1, self.tvPlaying)
                 #UpdateDevice(3, 1, self.tvSource)
             else:                                       # TV is off so set devices to off
-                self.tvPlaying = "Off"
-                UpdateDevice(1, 0, self.tvPlaying)          #Status
-                if Parameters["Mode3"] == "Volume":
-                    UpdateDevice(2, 0, str(self.tvVolume))  #Volume
-                self.tvSource = 0
-                self.tvControl = 0
-                self.tvChannel = 0
-                UpdateDevice(3, 0, str(self.tvSource))      #Source
-                UpdateDevice(4, 0, str(self.tvControl))     #Control
-                UpdateDevice(5, 0, str(self.tvChannel))     #Channel
+                self.ClearDevices()
         # TV is on
         else:
             if self.tvPlaying == "Off":                 # TV is set to off in Domoticz, but self.powerOn is still true
-                UpdateDevice(1, 0, self.tvPlaying)
-                if Parameters["Mode3"] == "Volume":
-                    UpdateDevice(2, 0, str(self.tvVolume))
-                self.tvSource = 0
-                self.tvControl = 0
-                self.tvChannel = 0
-                UpdateDevice(3, 0, str(self.tvSource))
-                UpdateDevice(4, 0, str(self.tvControl))
-                UpdateDevice(5, 0, str(self.tvChannel))
+                self.ClearDevices()
             else:                                       # TV is on so set devices to on
                 if not self.tvPlaying:
                     Domoticz.Debug("No information from TV received (TV was paused and then continued playing from disk) - SyncDevices")
                 else:
                     UpdateDevice(1, 1, self.tvPlaying)
                     UpdateDevice(3, 1, str(self.tvSource))
-                if Parameters["Mode3"] == "Volume":
-                    UpdateDevice(2, 2, str(self.tvVolume))
+                if Parameters["Mode3"] == "Volume": UpdateDevice(2, 2, str(self.tvVolume))
                 UpdateDevice(4, 1, str(self.tvControl))
                 UpdateDevice(5, 1, str(self.tvChannel))
 
+        return
+    
+    def ClearDevices(self):
+        self.tvPlaying = "Off"
+        UpdateDevice(1, 0, self.tvPlaying)          #Status
+        if Parameters["Mode3"] == "Volume": UpdateDevice(2, 0, str(self.tvVolume))  #Volume
+        self.tvSource = 0
+        self.tvControl = 0
+        self.tvChannel = 0
+        UpdateDevice(3, 0, str(self.tvSource))      #Source
+        UpdateDevice(4, 0, str(self.tvControl))     #Control
+        UpdateDevice(5, 0, str(self.tvChannel))     #Channel
+        
         return
     
     def GetTVInfo(self):
@@ -346,10 +342,10 @@ class BasePlugin:
             if self.tvPlaying['programTitle'] != None:      # Get information on channel and program title if tuner of TV is used
                 if self.tvPlaying['startDateTime'] != None: # Show start time and end time of program
                     self.startTime, self.endTime, self.perc_playingTime = _tv.playing_time(self.tvPlaying['startDateTime'], self.tvPlaying['durationSec'])
-                    self.tvPlaying = (self.tvPlaying['title'] + ' - ' + self.tvPlaying['programTitle'] + ' [' + str(self.startTime) + ' - ' + str(self.endTime) +']')
+                    self.tvPlaying = (self.tvPlaying['title'] + ' (' + self.tvPlaying['dispNum'] + ')' + ' - ' + self.tvPlaying['programTitle'] + ' [' + str(self.startTime) + ' - ' + str(self.endTime) +']')
                     Domoticz.Debug("Program information: " + str(self.startTime) + "-" + str(self.endTime) + " [" + str(self.perc_playingTime) + "%]")
                 else:
-                    self.tvPlaying = str((self.tvPlaying['title'] + ' - ' + self.tvPlaying['programTitle']))
+                    self.tvPlaying = str((self.tvPlaying['title'] + ' (' + self.tvPlaying['dispNum'] + ')' + ' - ' + self.tvPlaying['programTitle']))
                 UpdateDevice(1, 1, self.tvPlaying)
                 self.tvSource = 10
                 UpdateDevice(3, 1, str(self.tvSource))        # Set source device to TV
@@ -381,13 +377,14 @@ class BasePlugin:
             if Parameters["Mode3"] == "Volume":
                 self.tvVolume = _tv.get_volume_info()
                 self.tvVolume = self.tvVolume['volume']
-                if self.tvVolume != None:
-                    UpdateDevice(2, 2, str(self.tvVolume))
+                if self.tvVolume != None: UpdateDevice(2, 2, str(self.tvVolume))
                     
             # Update control and channel devices
             UpdateDevice(4, 1, str(self.tvControl))
             UpdateDevice(5, 1, str(self.tvChannel))
-    
+        
+        return
+
 _plugin = BasePlugin()
 
 def onStart():
