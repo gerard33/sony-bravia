@@ -106,6 +106,8 @@ Thanks to ffes for `localtest.py` which is part of his [Buienradar](https://gith
 
 * KDL-55W805C
 
+* KD-55X9005B
+
 * KDL-42W805A --> with the use of cookies, check [this](http://www.domoticz.com/forum/viewtopic.php?f=65&t=16910&p=128866#p128866) for more information
 
 * X8509C Android
