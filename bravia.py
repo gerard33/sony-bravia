@@ -100,8 +100,8 @@ class BraviaRC:
             return False
 
         else:
-            Domoticz.Debug(json.dumps(response.json(), indent=4))
-            self._cookies = response.cookies
+            Domoticz.Debug(response)
+            #self._cookies = response.cookies
             return True
 
         return False
