@@ -3,7 +3,7 @@
 #       Author: G3rard, 2017
 #       
 """
-<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="0.5" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
+<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="0.6" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
     <description>
 Sony Bravia plugin.<br/><br/>
 It will work on Sony Bravia models 2013 and newer.<br/>
@@ -76,7 +76,7 @@ class BasePlugin:
                                     "SelectorStyle" : "0"
                                 }
         self.SourceOptions5 =   {   "LevelActions"  : "||||||||||", 
-                                    "LevelNames"    : "Off|--Choose a channel--|CH1|CH2|CH3|CH4|CH5|CH6|CH7|CH8|CH9",
+                                    "LevelNames"    : "Off|CH1|CH2|CH3|CH4|CH5|CH6|CH7|CH8|CH9|--Choose a channel--",
                                     "LevelOffHidden": "true",
                                     "SelectorStyle" : "1"
                                 }
@@ -184,7 +184,7 @@ class BasePlugin:
                 # Remote buttons (action is capitalized so chosen for Command)
                 elif Command == "ChannelUp": _tv.send_req_ircc("AAAAAQAAAAEAAAAQAw==")       # ChannelUp
                 elif Command == "ChannelDown": _tv.send_req_ircc("AAAAAQAAAAEAAAARAw==")     # ChannelDown
-                elif Command == "Channels": _tv.send_req_ircc("AAAAAgAAABoAAABhAw==")        # PopUpMenu
+                elif Command == "Channels": _tv.send_req_ircc("AAAAAQAAAAEAAAA6Aw==")        # Display, shows information on what is playing
                 elif Command == "VolumeUp": _tv.send_req_ircc("AAAAAQAAAAEAAAASAw==")        # VolumeUp
                 elif Command == "VolumeDown": _tv.send_req_ircc("AAAAAQAAAAEAAAATAw==")      # VolumeDown
                 elif Command == "Mute": _tv.send_req_ircc("AAAAAQAAAAEAAAAUAw==")            # Mute
@@ -252,16 +252,16 @@ class BasePlugin:
             
             if Unit == 5:   # TV channels
                 if Command == 'Set Level':
-                    # Level 10 = --Choose a channel--
-                    if Level == 20: _tv.send_req_ircc("AAAAAQAAAAEAAAAAAw==") #1
-                    if Level == 30: _tv.send_req_ircc("AAAAAQAAAAEAAAABAw==") #2
-                    if Level == 40: _tv.send_req_ircc("AAAAAQAAAAEAAAACAw==") #3
-                    if Level == 50: _tv.send_req_ircc("AAAAAQAAAAEAAAADAw==") #4
-                    if Level == 60: _tv.send_req_ircc("AAAAAQAAAAEAAAAEAw==") #5
-                    if Level == 70: _tv.send_req_ircc("AAAAAQAAAAEAAAAFAw==") #6
-                    if Level == 80: _tv.send_req_ircc("AAAAAQAAAAEAAAAGAw==") #7
-                    if Level == 90: _tv.send_req_ircc("AAAAAQAAAAEAAAAHAw==") #8
-                    if Level == 100: _tv.send_req_ircc("AAAAAQAAAAEAAAAIAw==") #9
+                    if Level == 10: _tv.send_req_ircc("AAAAAQAAAAEAAAAAAw==") #1
+                    if Level == 20: _tv.send_req_ircc("AAAAAQAAAAEAAAABAw==") #2
+                    if Level == 30: _tv.send_req_ircc("AAAAAQAAAAEAAAACAw==") #3
+                    if Level == 40: _tv.send_req_ircc("AAAAAQAAAAEAAAADAw==") #4
+                    if Level == 50: _tv.send_req_ircc("AAAAAQAAAAEAAAAEAw==") #5
+                    if Level == 60: _tv.send_req_ircc("AAAAAQAAAAEAAAAFAw==") #6
+                    if Level == 70: _tv.send_req_ircc("AAAAAQAAAAEAAAAGAw==") #7
+                    if Level == 80: _tv.send_req_ircc("AAAAAQAAAAEAAAAHAw==") #8
+                    if Level == 90: _tv.send_req_ircc("AAAAAQAAAAEAAAAIAw==") #9
+                    # Level 100 = --Choose a channel--
                     self.tvChannel = Level
                     self.SyncDevices()
         
@@ -286,12 +286,10 @@ class BasePlugin:
         except Exception as err:
             Domoticz.Log('Not connected to TV (' +  err + ')')
 
-        if tvStatus == 'active':    # TV is on
+        if tvStatus == 'active':                            # TV is on
             self.powerOn = True
-            #-> to do
-            #if self.tvPlaying != "Off":
             self.GetTVInfo()
-        else:                       # TV is off or standby
+        else:                                               # TV is off or standby
             self.powerOn = False
             self.SyncDevices()
 
