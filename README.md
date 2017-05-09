@@ -21,7 +21,9 @@ It will work on Sony Bravia models 2013 and newer. Also tested on Sony Bravia X8
 **Information on the TV channel and program are only showed when you use the built-in TV tuner. Otherwise for example HDMI1 will be shown.**
 
 **The volume slides shows the volume of the built-in speakers. If you have an amplifier attached to your TV, that volume is not shown.**
-*You can use the on/off button of the slider though to mute/unmute the TV, also if you have the TV connected to an amplifier.*
+*You can use the on/off button of the slider switch though to mute/unmute the TV, also if you have the TV connected to an amplifier.*
+
+**The remote control in the Status switch gives some extra options. See the screenshot below for extra info on some of the buttons.**
 
 ## Sony Bravia plugin instructions
 Works with Pre-Shared Key (PSK). The default PSK you can use is 'sony', but you can change the PSK to something else. If you change it, remember to also change the PSK in the Domoticz hardware page.
