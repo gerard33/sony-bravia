@@ -85,6 +85,8 @@ After clicking on the Add button the devices are available in the **Setup - Devi
 
 ![tvhw](https://cloud.githubusercontent.com/assets/11230573/25202178/bcfb2998-2554-11e7-80ec-9b2e85ee59f4.png)
 
+![remote_functions](https://cloud.githubusercontent.com/assets/11230573/25874696/faddb72a-3513-11e7-9a43-f658de2eec4c.png)
+
 ## Testing the plugin
 To do some easy testing with the plugin there is a `localtest.py` script that can be run from the command line.
 Make sure you enter the IP address and PSK of your TV in `localtest.py` before executing it.
