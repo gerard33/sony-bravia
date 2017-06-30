@@ -15,7 +15,7 @@ Also a lot of inspiration came from this [post](http://www.domoticz.com/forum/vi
 
 ## Information
 The plugin will show information from your Sony Bravia TV in Domoticz.
-It will work on Sony Bravia models 2013 and newer. Also tested on Sony Bravia X8509C with Android.
+It will work on Sony Bravia models 2013 and newer. Also tested on Sony Bravia X8509C and 55SD8505 with Android.
 (Although not sure yet it will work on all Android TV's, maybe some models need simple IP control.)
 
 **Information on the TV channel and program are only showed when you use the built-in TV tuner. Otherwise for example HDMI1 will be shown.**
@@ -43,6 +43,7 @@ The IP address, PSK and MAC address need to be entered in the Domoticz hardware 
 
 ### Domoticz settings
 See this [link](https://www.domoticz.com/wiki/Using_Python_plugins) for more information on the Domoticz plugins.
+This plugin works with the old and new version of the Python framework in Domoticz.
 * SSH to your server on which Domoticz is installed
 
 * Enter the following commands
