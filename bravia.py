@@ -218,8 +218,11 @@ class BraviaRC:
             results = resp.get('result')[0]
             for result in results:
                 if result['source'] == 'extInput:hdmi':  # hdmi input
+                ###if result['source'] in ('extInput:hdmi', 'extInput:composite', 'extInput:component'):  # physical inputs
+                ###new version, see https://github.com/aparraga/braviarc/commit/d9d26b802ffd669bae40f26160689173b0ce77c8
                     resp = self.bravia_req_json("sony/avContent",
                                                 self._jdata_build("getContentList", {"source": "extInput:hdmi"}))
+                                                ###self._jdata_build("getContentList", result))
                     if not resp.get('error'):
                         original_content_list.extend(resp.get('result')[0])
 
@@ -318,7 +321,7 @@ class BraviaRC:
     def turn_on_command(self):
         """Turn the media player on using command. Only confirmed working on Android, can be used when WOL is not available."""
         if self.get_power_status() != 'active':
-            #self.send_req_ircc(self.get_command_code('TvPower'))
+            self.send_req_ircc(self.get_command_code('TvPower'))
             self.bravia_req_json("sony/system", self._jdata_build("setPowerStatus", {"status": "true"}))
 
     def turn_off(self):
