@@ -250,8 +250,7 @@ class BasePlugin:
     def onHeartbeat(self):
         try:
             tvStatus = _tv.get_power_status()
-            Domoticz.Debug("Status TV: " + str(tvStatus)
-        #except KeyError:
+            Domoticz.Debug("Status TV: " + str(tvStatus))
         except Exception as err:
             Domoticz.Log("Not connected to TV (" +  str(err) + ")")
 
