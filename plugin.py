@@ -3,7 +3,7 @@
 #       Author: G3rard, 2017
 #       
 """
-<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="1.0" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
+<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="1.1" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
     <description>
 Sony Bravia plugin.<br/><br/>
 It will work on Sony Bravia models 2013 and newer.<br/>
@@ -41,7 +41,6 @@ import datetime
 from bravia import BraviaRC
 
 class BasePlugin:
-    isConnected = False
     powerOn = False
     tvState = 0
     tvVolume = 0
@@ -81,17 +80,17 @@ class BasePlugin:
                                     "SelectorStyle" : "1"
                                 }
                                     
-        if (len(Devices) == 0):
+        if len(Devices) == 0:
             Domoticz.Device(Name="Status", Unit=1, Type=17, Image=2, Switchtype=17).Create()
             if Parameters["Mode3"] == "Volume": Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8).Create()
             Domoticz.Device(Name="Source", Unit=3, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions3).Create()
             Domoticz.Device(Name="Control", Unit=4, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions4).Create()
             Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5).Create()
             Domoticz.Log("Devices created")
-        elif (Parameters["Mode3"] == "Volume" and 2 not in Devices):
+        elif Parameters["Mode3"] == "Volume" and 2 not in Devices:
             Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8).Create()
             Domoticz.Log("Volume device created")
-        elif (Parameters["Mode3"] != "Volume" and 2 in Devices):
+        elif Parameters["Mode3"] != "Volume" and 2 in Devices:
             Devices[2].Delete()
             Domoticz.Log("Volume device deleted")
         elif 1 not in Devices:
@@ -107,11 +106,11 @@ class BasePlugin:
             Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5).Create()
             Domoticz.Log("Channel device created")
         else:
-            if (1 in Devices): self.tvState = Devices[1].nValue    #--> of sValue
-            if (2 in Devices): self.tvVolume = Devices[2].nValue   #--> of sValue
-            if (3 in Devices): self.tvSource = Devices[3].sValue
-            if (4 in Devices): self.tvControl = Devices[4].sValue
-            if (5 in Devices): self.tvChannel = Devices[5].sValue
+            if 1 in Devices: self.tvState = Devices[1].nValue    #--> of sValue
+            if 2 in Devices: self.tvVolume = Devices[2].nValue   #--> of sValue
+            if 3 in Devices: self.tvSource = Devices[3].sValue
+            if 4 in Devices: self.tvControl = Devices[4].sValue
+            if 5 in Devices: self.tvChannel = Devices[5].sValue
         
         # Set update interval, values below 10 seconds are not allowed due to timeout of 5 seconds in bravia.py script
         updateInterval = int(Parameters["Mode5"])
@@ -139,14 +138,14 @@ class BasePlugin:
             if Unit == 1:     # TV power switch
                 if action == "On":
                     # Start TV when WOL is not available, only works on Android
-                    if (Parameters["Mode2"] == "Android"):
+                    if Parameters["Mode2"] == "Android":
                         Domoticz.Log("No MAC address configured, TV will be started with setPowerStatus command (Android only)")
                         try:
                             _tv.turn_on_command()
                             self.tvPlaying = "TV starting" # Show that the TV is starting, as booting the TV takes some time
                             self.SyncDevices()
                         except Exception as err:
-                            Domoticz.Log('Error when starting TV with set PowerStatus, Android only (' +  err + ')')
+                            Domoticz.Log("Error when starting TV with set PowerStatus, Android only (" +  str(err) + ")")
                     # Start TV using WOL
                     else:
                         try:
@@ -154,7 +153,7 @@ class BasePlugin:
                             self.tvPlaying = "TV starting" # Show that the TV is starting, as booting the TV takes some time
                             self.SyncDevices()
                         except Exception as err:
-                            Domoticz.Log('Error when starting TV using WOL (' +  err + ')')
+                            Domoticz.Log("Error when starting TV using WOL (" +  str(err) + ")")
         else:
             if Unit == 1:     # TV power switch
                 if action == "Off":
@@ -251,17 +250,17 @@ class BasePlugin:
     def onHeartbeat(self):
         try:
             tvStatus = _tv.get_power_status()
-            Domoticz.Debug('Status TV: ' + tvStatus)
+            Domoticz.Debug("Status TV: " + str(tvStatus)
         #except KeyError:
         except Exception as err:
-            Domoticz.Log('Not connected to TV (' +  err + ')')
+            Domoticz.Log("Not connected to TV (" +  str(err) + ")")
 
         if tvStatus == 'active':                        # TV is on
             self.powerOn = True
             try:
                 self.GetTVInfo()
-            except (Exception, TypeError) as err:
-                Domoticz.Error('No data received from TV, probably it has just been turned off (' +  err + ')')
+            except Exception as err:
+                Domoticz.Error("No data received from TV, probably it has just been turned off (" +  str(err) + ")")
         else:                                           # TV is off or standby
             self.powerOn = False
             self.SyncDevices()
@@ -373,7 +372,7 @@ def UpdateDevice(Unit, nValue, sValue, AlwaysUpdate=False):
     if (Unit in Devices):
         if ((Devices[Unit].nValue != nValue) or (Devices[Unit].sValue != sValue) or (AlwaysUpdate == True)):
             Devices[Unit].Update(nValue, str(sValue))
-            Domoticz.Log("Update "+str(nValue)+":'"+str(sValue)+"' ("+Devices[Unit].Name+")")
+            Domoticz.Log("Update "+Devices[Unit].Name+": "+str(nValue)+" - '"+str(sValue)+"'")
     return
 
 # Generic helper functions
