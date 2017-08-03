@@ -3,7 +3,7 @@
 #       Author: G3rard, 2017
 #       
 """
-<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="1.1" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
+<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="1.2" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
     <description>
 Sony Bravia plugin.<br/><br/>
 It will work on Sony Bravia models 2013 and newer.<br/>
@@ -60,7 +60,9 @@ class BasePlugin:
     def onStart(self):
         global _tv
         
-        if Parameters["Mode6"] == "Debug": Domoticz.Debugging(1)
+        if Parameters["Mode6"] == "Debug":
+            Domoticz.Debugging(1)
+            DumpConfigToLog()
         
         _tv = BraviaRC(Parameters["Address"], Parameters["Mode1"], Parameters["Mode2"]) #IP, PSK, MAC
         
@@ -81,29 +83,29 @@ class BasePlugin:
                                 }
                                     
         if len(Devices) == 0:
-            Domoticz.Device(Name="Status", Unit=1, Type=17, Image=2, Switchtype=17).Create()
-            if Parameters["Mode3"] == "Volume": Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8).Create()
-            Domoticz.Device(Name="Source", Unit=3, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions3).Create()
-            Domoticz.Device(Name="Control", Unit=4, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions4).Create()
-            Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5).Create()
+            Domoticz.Device(Name="Status", Unit=1, Type=17, Image=2, Switchtype=17, Used=1).Create()
+            if Parameters["Mode3"] == "Volume": Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8, Used=1).Create()
+            Domoticz.Device(Name="Source", Unit=3, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions3, Used=1).Create()
+            Domoticz.Device(Name="Control", Unit=4, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions4, Used=1).Create()
+            Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5, Used=1).Create()
             Domoticz.Log("Devices created")
         elif Parameters["Mode3"] == "Volume" and 2 not in Devices:
-            Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8).Create()
+            Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8, Used=1).Create()
             Domoticz.Log("Volume device created")
         elif Parameters["Mode3"] != "Volume" and 2 in Devices:
             Devices[2].Delete()
             Domoticz.Log("Volume device deleted")
         elif 1 not in Devices:
-            Domoticz.Device(Name="Status", Unit=1, Type=17, Image=2, Switchtype=17).Create()
+            Domoticz.Device(Name="Status", Unit=1, Type=17, Image=2, Switchtype=17, Used=1).Create()
             Domoticz.Log("TV device created")
         elif 3 not in Devices:
-            Domoticz.Device(Name="Source", Unit=3, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions3).Create()
+            Domoticz.Device(Name="Source", Unit=3, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions3, Used=1).Create()
             Domoticz.Log("Source device created")
         elif 4 not in Devices:
-            Domoticz.Device(Name="Control", Unit=4, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions4).Create()
+            Domoticz.Device(Name="Control", Unit=4, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions4, Used=1).Create()
             Domoticz.Log("Control device created")
         elif 5 not in Devices:
-            Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5).Create()
+            Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5, Used=1).Create()
             Domoticz.Log("Channel device created")
         else:
             if 1 in Devices: self.tvState = Devices[1].nValue    #--> of sValue
@@ -120,8 +122,6 @@ class BasePlugin:
             Domoticz.Heartbeat(updateInterval)
         else:
             Domoticz.Heartbeat(30)
-        
-        DumpConfigToLog()
 
         return #--> return True
     
@@ -368,10 +368,10 @@ def onHeartbeat():
 # Update Device into database
 def UpdateDevice(Unit, nValue, sValue, AlwaysUpdate=False):
     # Make sure that the Domoticz device still exists (they can be deleted) before updating it 
-    if (Unit in Devices):
+    if Unit in Devices:
         if ((Devices[Unit].nValue != nValue) or (Devices[Unit].sValue != sValue) or (AlwaysUpdate == True)):
             Devices[Unit].Update(nValue, str(sValue))
-            Domoticz.Log("Update "+Devices[Unit].Name+": "+str(nValue)+" - '"+str(sValue)+"'")
+            Domoticz.Log("Update " + Devices[Unit].Name + ": " + str(nValue) + " - '" + str(sValue) + "'")
     return
 
 # Generic helper functions
