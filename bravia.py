@@ -92,15 +92,15 @@ class BraviaRC:
                 response = response.read()
 
         except urllib.error.HTTPError as exception_instance:
-            Domoticz.Error("[W] HTTPError: " + str(exception_instance))
+            Domoticz.Debug("[bravia_connect] HTTPError: " + str(exception_instance))
             return False
 
         except Exception as exception_instance:  # pylint: disable=broad-except
-            Domoticz.Error("[W] Exception: " + str(exception_instance))
+            Domoticz.Debug("[bravia_connect] Exception: " + str(exception_instance))
             return False
 
         else:
-            Domoticz.Debug(response)
+            Domoticz.Debug(str(response))
             #self._cookies = response.cookies
             return True
 
@@ -145,11 +145,11 @@ class BraviaRC:
                 response = response.read()
         except urllib.error.HTTPError as exception_instance:
             if log_errors:
-                Domoticz.Error("HTTPError: " + str(exception_instance))
+                Domoticz.Debug("[bravia_send_req_ircc] HTTPError: " + str(exception_instance))
 
         except Exception as exception_instance:  # pylint: disable=broad-except
             if log_errors:
-                Domoticz.Error("Exception: " + str(exception_instance))
+                Domoticz.Debug("[bravia_send_req_ircc] Exception: " + str(exception_instance))
         else:
             #content = response.content
             #return content
@@ -167,12 +167,12 @@ class BraviaRC:
                 #print(response.decode('utf-8'))
         except urllib.error.HTTPError as exception_instance:
             if log_errors:
-                Domoticz.Error("HTTPError: " + str(exception_instance))
+                Domoticz.Debug("[bravia_bravia_req_json] HTTPError: " + str(exception_instance))
             Domoticz.Debug('No reaction of TV due to HTTPError')
 
         except Exception as exception_instance:  # pylint: disable=broad-except
             if log_errors:
-                Domoticz.Error("Exception: " + str(exception_instance))
+                Domoticz.Debug("[bravia_bravia_req_json] Exception: " + str(exception_instance))
             Domoticz.Debug('No reaction of TV, assumed it is off')
 
         else:
@@ -265,7 +265,7 @@ class BraviaRC:
         if not resp.get('error'):
             self._commands = resp.get('result')[1]
         else:
-            Domoticz.Error("JSON request error: " + json.dumps(resp, indent=4))
+            Domoticz.Debug("[bravia_refresh_commands] JSON request error: " + json.dumps(resp, indent=4))
 
     def get_command_code(self, command_name):
         if len(self._commands) == 0:
@@ -284,7 +284,7 @@ class BraviaRC:
                 if result.get('target') == 'speaker':
                     return result
         else:
-            Domoticz.Error("JSON request error:" + json.dumps(resp, indent=4))
+            Domoticz.Debug("[get_volume_info] JSON request error:" + json.dumps(resp, indent=4))
         return None
         
     def get_system_info(self):
