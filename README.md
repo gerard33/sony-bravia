@@ -76,7 +76,7 @@ Make sure you enter all the required fields.
 | Update interval | Enter the update interval in seconds, this determines with which interval the plugin polls the TV (must be between 10 and 30 seconds) |
 | Debug | When set to true the plugin shows additional information in the Domoticz log |
 
-After clicking on the Add button the devices are available in the **Setup - Devices** page, from where the devices can be added to the **Switches** tab.
+After clicking on the Add button the devices are available in the **Switches** tab.
 
 ## Screenshots
 ![tv](https://cloud.githubusercontent.com/assets/11230573/25202175/bc1c9db8-2554-11e7-9a0f-39d182c700f5.png)
