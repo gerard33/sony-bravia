@@ -105,22 +105,24 @@ This will print some information regarding the TV to the console.
 Thanks to ffes for `localtest.py` which is part of his [Buienradar](https://github.com/ffes/domoticz-buienradar) Python script.
 
 ## Confirmed working on the following TV´s
-* KDL-50W829B
+- [x] KDL-50W829B
 
-* KDL-42W705B
+- [x] KDL-42W705B
 
-* KDL-55W805C
+- [x] KDL-55W805C
 
-* KD-55X9005B
+- [x] KD-55X9005B
 
-* KDL-42W805A --> with the use of cookies, check [this](http://www.domoticz.com/forum/viewtopic.php?f=65&t=16910&p=128866#p128866) for more information
+- [x] KDL-42W805A --> with the use of cookies, check [this](http://www.domoticz.com/forum/viewtopic.php?f=65&t=16910&p=128866#p128866) for more information
 
-* KD-49XD8305 Android
+- [x] KD-49XD8305 Android
 
-* KD-55X8509C Android
+- [x] KD-55X8509C Android
 
-* KD-55SD8505 Android
+- [x] KD-55SD8505 Android
 
-* KD-55XD8505 Android
+- [x] KD-55XD8505 Android
 
-* KDL-50W755c Android
+- [x] KD-55XD8005 Android
+
+- [x] KDL-50W755c Android
