@@ -71,7 +71,7 @@ Make sure you enter all the required fields.
 | ----- | ---------- |
 | IP address | Enter the IP address of your TV (see instructions above how to find the IP address, also make sure it is static) |
 | Pre-shared key | Enter the Pre-shared key here (default is sony) |
-| MAC address | Enter the MAC address of your TV (see instructions above how to find the MAC address) |
+| MAC address | Enter the MAC address of your TV (see instructions above how to find the MAC address). If you have an Android TV you can enter 'Android' (without quotes) in the MAC field. This way the plugin will use another method to switch on the TV. |
 | Volume bar | Option to enable or disable a Domoticz device for the volume bar, this can be used to control the volume of the TV, but only for the built-in speakers of the TV |
 | Update interval | Enter the update interval in seconds, this determines with which interval the plugin polls the TV (must be between 10 and 30 seconds) |
 | Debug | When set to true the plugin shows additional information in the Domoticz log |
