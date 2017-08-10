@@ -3,7 +3,7 @@
 #       Author: G3rard, 2017
 #       
 """
-<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="1.2" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
+<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="1.3" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
     <description>
 Sony Bravia plugin.<br/><br/>
 It will work on Sony Bravia models 2013 and newer.<br/>
@@ -48,6 +48,7 @@ class BasePlugin:
     tvControl = 0
     tvChannel = 10
     tvPlaying = {}
+    currentChannel = 0
     SourceOptions3 = {}
     SourceOptions4 = {}
     SourceOptions5 = {}
@@ -82,37 +83,29 @@ class BasePlugin:
                                     "SelectorStyle" : "1"
                                 }
                                     
-        if len(Devices) == 0:
-            Domoticz.Device(Name="Status", Unit=1, Type=17, Image=2, Switchtype=17, Used=1).Create()
-            if Parameters["Mode3"] == "Volume": Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8, Used=1).Create()
-            Domoticz.Device(Name="Source", Unit=3, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions3, Used=1).Create()
-            Domoticz.Device(Name="Control", Unit=4, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions4, Used=1).Create()
-            Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5, Used=1).Create()
-            Domoticz.Log("Devices created")
-        elif Parameters["Mode3"] == "Volume" and 2 not in Devices:
-            Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8, Used=1).Create()
-            Domoticz.Log("Volume device created")
-        elif Parameters["Mode3"] != "Volume" and 2 in Devices:
-            Devices[2].Delete()
-            Domoticz.Log("Volume device deleted")
-        elif 1 not in Devices:
+        if 1 not in Devices:
             Domoticz.Device(Name="Status", Unit=1, Type=17, Image=2, Switchtype=17, Used=1).Create()
             Domoticz.Log("TV device created")
-        elif 3 not in Devices:
+        if 2 not in Devices and Parameters["Mode3"] == "Volume":
+            Domoticz.Device(Name="Volume", Unit=2, Type=244, Subtype=73, Switchtype=7, Image=8, Used=1).Create()
+            Domoticz.Log("Volume device created")
+        if 2 in Devices and Parameters["Mode3"] != "Volume":
+            Devices[2].Delete()
+            Domoticz.Log("Volume device deleted")
+        if 3 not in Devices:
             Domoticz.Device(Name="Source", Unit=3, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions3, Used=1).Create()
             Domoticz.Log("Source device created")
-        elif 4 not in Devices:
+        if 4 not in Devices:
             Domoticz.Device(Name="Control", Unit=4, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions4, Used=1).Create()
             Domoticz.Log("Control device created")
-        elif 5 not in Devices:
+        if 5 not in Devices:
             Domoticz.Device(Name="Channel", Unit=5, TypeName="Selector Switch", Switchtype=18, Image=2, Options=self.SourceOptions5, Used=1).Create()
             Domoticz.Log("Channel device created")
-        else:
-            if 1 in Devices: self.tvState = Devices[1].nValue    #--> of sValue
-            if 2 in Devices: self.tvVolume = Devices[2].nValue   #--> of sValue
-            if 3 in Devices: self.tvSource = Devices[3].sValue
-            if 4 in Devices: self.tvControl = Devices[4].sValue
-            if 5 in Devices: self.tvChannel = Devices[5].sValue
+        if 1 in Devices: self.tvState = Devices[1].nValue    #--> of sValue
+        if 2 in Devices: self.tvVolume = Devices[2].nValue   #--> of sValue
+        if 3 in Devices: self.tvSource = Devices[3].sValue
+        if 4 in Devices: self.tvControl = Devices[4].sValue
+        if 5 in Devices: self.tvChannel = Devices[5].sValue
         
         # Set update interval, values below 10 seconds are not allowed due to timeout of 5 seconds in bravia.py script
         updateInterval = int(Parameters["Mode5"])
@@ -123,7 +116,7 @@ class BasePlugin:
         else:
             Domoticz.Heartbeat(30)
 
-        return #--> return True
+        return
     
     # Executed each time we click on device through Domoticz GUI
     def onCommand(self, Unit, Command, Level, Hue):
@@ -294,9 +287,7 @@ class BasePlugin:
         self.tvPlaying = "Off"
         UpdateDevice(1, 0, self.tvPlaying)          #Status
         if Parameters["Mode3"] == "Volume": UpdateDevice(2, 0, str(self.tvVolume))  #Volume
-        self.tvSource = 0
-        self.tvControl = 0
-        self.tvChannel = 0
+        self.tvSource = self.tvControl = self.tvChannel = 0
         UpdateDevice(3, 0, str(self.tvSource))      #Source
         UpdateDevice(4, 0, str(self.tvControl))     #Control
         UpdateDevice(5, 0, str(self.tvChannel))     #Channel
@@ -309,6 +300,7 @@ class BasePlugin:
             Domoticz.Debug("No information from TV received (TV was paused and then continued playing from disk)")
         else:
             if self.tvPlaying['programTitle'] != None:      # Get information on channel and program title if tuner of TV is used
+                self.currentChannel = int(self.tvPlaying['dispNum']) # Store current channel to update channel list selector switch
                 if self.tvPlaying['startDateTime'] != None: # Show start time and end time of program
                     self.startTime, self.endTime, self.perc_playingTime = _tv.playing_time(self.tvPlaying['startDateTime'], self.tvPlaying['durationSec'])
                     self.tvPlaying = str(int(self.tvPlaying['dispNum'])) + ': ' + self.tvPlaying['title'] + ' - ' + self.tvPlaying['programTitle'] + ' [' + str(self.startTime) + ' - ' + str(self.endTime) +']'
@@ -323,24 +315,14 @@ class BasePlugin:
                     self.tvPlaying = self.tvPlaying['title']
                 else:
                     self.tvPlaying = "Netflix"              # When TV plays apps, no title information (in this case '') is available, so assume Netflix is playing
-                if "/MHL" in self.tvPlaying:                # Source contains /MHL, that can be removed
-                    self.tvPlaying = self.tvPlaying.replace("/MHL", "")
+                if "/MHL" in self.tvPlaying: self.tvPlaying = self.tvPlaying.replace("/MHL", "")    # Source contains /MHL, that can be removed
                 UpdateDevice(1, 1, self.tvPlaying)
-                if "HDMI 1" in self.tvPlaying:
-                    self.tvSource = 20
-                    UpdateDevice(3, 1, str(self.tvSource))  # Set source device to HDMI1
-                elif "HDMI 2" in self.tvPlaying:
-                    self.tvSource = 30
-                    UpdateDevice(3, 1, str(self.tvSource))  # Set source device to HDMI2
-                elif "HDMI 3" in self.tvPlaying:
-                    self.tvSource = 40
-                    UpdateDevice(3, 1, str(self.tvSource))  # Set source device to HDMI3
-                elif "HDMI 4" in self.tvPlaying:
-                    self.tvSource = 50
-                    UpdateDevice(3, 1, str(self.tvSource))  # Set source device to HDMI4
-                elif "Netflix" in self.tvPlaying:
-                    self.tvSource = 60
-                    UpdateDevice(3, 1, str(self.tvSource))  # Set source device to Netflix
+                if "HDMI 1"  in self.tvPlaying: self.tvSource = 20
+                if "HDMI 2"  in self.tvPlaying: self.tvSource = 30
+                if "HDMI 3"  in self.tvPlaying: self.tvSource = 40
+                if "HDMI 4"  in self.tvPlaying: self.tvSource = 50
+                if "Netflix" in self.tvPlaying: self.tvSource = 60
+                UpdateDevice(3, 1, str(self.tvSource))  # Set source device
             
             # Get volume information of TV
             if Parameters["Mode3"] == "Volume":
@@ -350,6 +332,13 @@ class BasePlugin:
                     
             # Update control and channel devices
             UpdateDevice(4, 1, str(self.tvControl))
+            if 1 <= self.currentChannel <= 9:                # Update channel list if current channel is between 1-9
+                self.tvChannel = self.currentChannel * 10
+            elif self.currentChannel >= 10:
+                self.tvChannel = 100    #choose a channel
+            else:
+                self.tvChannel = 0
+            Domoticz.Debug("Current channel: " + str(self.currentChannel) + ". TV channel selector value: " + str(self.tvChannel))
             UpdateDevice(5, 1, str(self.tvChannel))
         
         return
@@ -369,7 +358,7 @@ def onHeartbeat():
 def UpdateDevice(Unit, nValue, sValue, AlwaysUpdate=False):
     # Make sure that the Domoticz device still exists (they can be deleted) before updating it 
     if Unit in Devices:
-        if ((Devices[Unit].nValue != nValue) or (Devices[Unit].sValue != sValue) or (AlwaysUpdate == True)):
+        if Devices[Unit].nValue != nValue or Devices[Unit].sValue != sValue or AlwaysUpdate == True:
             Devices[Unit].Update(nValue, str(sValue))
             Domoticz.Log("Update " + Devices[Unit].Name + ": " + str(nValue) + " - '" + str(sValue) + "'")
     return
