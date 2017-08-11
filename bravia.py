@@ -23,6 +23,7 @@ import struct
 import urllib.parse
 import urllib.request
 import urllib.error
+import re
 
 from datetime import datetime
 import time
@@ -38,7 +39,7 @@ class BraviaRC:
         self._host = host
         self._psk = psk
         self._mac = mac
-        self._cookies = None
+        self._cookies = "Cookie"
         self._commands = []
 
     def _jdata_build(self, method, params):
@@ -63,6 +64,7 @@ class BraviaRC:
         bool
             True if connected.
         """
+
         authorization = json.dumps(
             {"method": "actRegister",
              "params": [{"clientid": clientid,
@@ -72,24 +74,24 @@ class BraviaRC:
                           "function": "WOL"}]],
              "id": 1,
              "version": "1.0"}
-        ).encode('utf-8')
+        )	
 
         headers = {}
-        if pin:
-            username = ''
-            base64string = base64.encodebytes(('%s:%s' % (username, pin)).encode()) \
-                .decode().replace('\n', '')
-            headers['Authorization'] = "Basic %s" % base64string
-            headers['Connection'] = "keep-alive"
+        #if pin:
+        #    username = ''
+        #    base64string = base64.encodebytes(('%s:%s' % (username, pin)).encode()) \
+        #        .decode().replace('\n', '')
+        #    headers['Authorization'] = "Basic %s" % base64string
+        #    headers['Connection'] = "keep-alive"
 
         try:
             req = urllib.request.Request('http://'+self._host+'/sony/accessControl',
-                                         data=authorization,
+                                         data=authorization.encode("UTF-8"),
                                          headers=headers)
             #response = urllib.request.urlopen(req, timeout=TIMEOUT)
             #response.raise_for_status()
             with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
-                response = response.read()
+                response = response.info()
 
         except urllib.error.HTTPError as exception_instance:
             Domoticz.Debug("[bravia_connect] HTTPError: " + str(exception_instance))
@@ -100,8 +102,14 @@ class BraviaRC:
             return False
 
         else:
-            Domoticz.Debug(str(response))
+            #Domoticz.Debug(response)
+            
+            result = str(response)
+            self._cookies=("auth=" + re.search('auth=([A-Za-z0-9]+)',result).group(1))
+            
             #self._cookies = response.cookies
+            Domoticz.Debug(self._cookies)
+
             return True
 
         return False
@@ -129,7 +137,11 @@ class BraviaRC:
 
     def send_req_ircc(self, params, log_errors=True):
         """Send an IRCC command via HTTP to Sony Bravia."""
-        headers = {'X-Auth-PSK': self._psk, 'SOAPACTION': '"urn:schemas-sony-com:service:IRCC:1#X_SendIRCC"'}
+        if self._psk == "Cookie":
+            headers = {'Cookie': self._cookies, 'SOAPACTION': '"urn:schemas-sony-com:service:IRCC:1#X_SendIRCC"'} 
+        else:
+            headers = {'X-Auth-PSK': self._psk, 'SOAPACTION': '"urn:schemas-sony-com:service:IRCC:1#X_SendIRCC"'}
+            
         data = ("<?xml version=\"1.0\"?><s:Envelope xmlns:s=\"http://schemas.xmlsoap.org" +
                 "/soap/envelope/\" " +
                 "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>" +
@@ -158,9 +170,14 @@ class BraviaRC:
     def bravia_req_json(self, url, params, log_errors=True):
         """Send request command via HTTP json to Sony Bravia."""
         try:
-            req = urllib.request.Request(url='http://'+self._host+'/'+url,
-                                         data=params.encode("UTF-8"),
-                                         headers={'X-Auth-PSK': self._psk})
+            if self._psk == "Cookie" :
+                req = urllib.request.Request(url='http://'+self._host+'/'+url,
+											data=params.encode("UTF-8"),
+											headers={'Cookie': self._cookies})
+            else:
+                req = urllib.request.Request(url='http://'+self._host+'/'+url,
+											data=params.encode("UTF-8"),
+											headers={'X-Auth-PSK': self._psk})
             #response = urllib.request.urlopen(req)
             with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
                 response = response.read()
@@ -168,6 +185,7 @@ class BraviaRC:
         except urllib.error.HTTPError as exception_instance:
             if log_errors:
                 Domoticz.Debug("[bravia_bravia_req_json] HTTPError: " + str(exception_instance))
+                
             Domoticz.Debug('No reaction of TV due to HTTPError')
 
         except Exception as exception_instance:  # pylint: disable=broad-except
