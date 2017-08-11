@@ -3,7 +3,7 @@
 #       Author: G3rard, 2017
 #       
 """
-<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="1.2" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
+<plugin key="sony" name="Sony Bravia TV (with Kodi remote)" author="G3rard" version="1.2.1" wikilink="https://github.com/gerard33/sony-bravia" externallink="https://www.sony.com/electronics/bravia">
     <description>
 Sony Bravia plugin.<br/><br/>
 It will work on Sony Bravia models 2013 and newer.<br/>
@@ -263,7 +263,6 @@ class BasePlugin:
         else:                                           # TV is off or standby
             self.powerOn = False
             self.SyncDevices()
-
         return
 
     def SyncDevices(self):
@@ -306,7 +305,12 @@ class BasePlugin:
     def GetTVInfo(self):
         self.tvPlaying = _tv.get_playing_info()
         if not self.tvPlaying:                              # Dict is empty
-            Domoticz.Debug("No information from TV received (TV was paused and then continued playing from disk)")
+            #Domoticz.Debug("No information from TV received (TV was paused and then continued playing from disk)")
+            if Parameters["Mode1"] == "Cookie":
+                _tv.connect("1234" , "PluginID:4ac90769-8ae4-46a5-a4d6-df0371010727","Plugin (Domoticz Plugin)")
+                Domoticz.Debug("No information from TV received (Try to auto-renew Cookie)")
+            else:
+                Domoticz.Debug("No information from TV received (TV was paused and then continued playing from disk)")
         else:
             if self.tvPlaying['programTitle'] != None:      # Get information on channel and program title if tuner of TV is used
                 if self.tvPlaying['startDateTime'] != None: # Show start time and end time of program
