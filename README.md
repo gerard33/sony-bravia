@@ -4,7 +4,7 @@
 *This plugin uses the [Sony Bravia RC API](https://github.com/aparraga/braviarc) by Antonio Parraga Navarro.
 Also a lot of inspiration came from this [post](http://www.domoticz.com/forum/viewtopic.php?f=61&t=8301) by StefanPuntNL.*
 
-**This is a special branch to use the plugin with a cookie in stead of a PSK.**
+**This is a special branch to use the plugin with a cookie instead of a PSK.**
 
 ## Table of Contents
 - [Information](#information)
