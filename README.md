@@ -69,7 +69,7 @@ Make sure you enter all the required fields.
 | Field | Information|
 | ----- | ---------- |
 | IP address | Enter the IP address of your TV (see instructions above how to find the IP address, also make sure it is static) |
-| Pre-shared key | Enter the Pre-shared key here (default is sony) |
+| Pre-shared key | Enter the Pre-shared key here (default is sony). If you have issues using a PSK you can try to use the cookie method  at the [cookie branch](https://github.com/gerard33/sony-bravia/tree/cookie-auth), thanks to markcame for implementing this |
 | MAC address | Enter the MAC address of your TV (see instructions above how to find the MAC address). If you have an Android TV you can enter 'Android' (without quotes) in the MAC field. This way the plugin will use another method to switch on the TV. |
 | Volume bar | Option to enable or disable a Domoticz device for the volume bar, this can be used to control the volume of the TV, but only for the built-in speakers of the TV |
 | Update interval | Enter the update interval in seconds, this determines with which interval the plugin polls the TV (must be between 10 and 30 seconds) |
@@ -113,6 +113,8 @@ Thanks to ffes for `localtest.py` which is part of his [Buienradar](https://gith
 - [x] KD-55X9005B
 
 - [x] KDL-42W805A --> with the use of cookies, check [this](http://www.domoticz.com/forum/viewtopic.php?f=65&t=16910&p=128866#p128866) for more information
+
+- [x] KDL-60W605B
 
 - [x] KD-49XD8305 Android
 
