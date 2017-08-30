@@ -4,6 +4,8 @@
 *This plugin uses the [Sony Bravia RC API](https://github.com/aparraga/braviarc) by Antonio Parraga Navarro.
 Also a lot of inspiration came from this [post](http://www.domoticz.com/forum/viewtopic.php?f=61&t=8301) by StefanPuntNL.*
 
+**This is a special branch to use the plugin with a cookie in stead of a PSK.**
+
 ## Table of Contents
 - [Information](#information)
 - [Sony Bravia plugin instructions](#sony-bravia-plugin-instructions)
@@ -61,7 +63,12 @@ git clone https://github.com/gerard33/sony-bravia.git
 sudo service domoticz.sh restart
 ```
 
-* Now go to **Setup**, **Hardware** in your Domoticz interface. There you add
+**Extra instructions for getting the cookie**
+* edit auth.sh and put in the ip address of your TV
+* launch auth.sh, the TV will show a pin
+* enter the pin, pairing went ok if no error is displayed
+
+Now go to **Setup**, **Hardware** in your Domoticz interface. There you add
 **Sony Bravia TV**.
 
 Make sure you enter all the required fields.
@@ -69,7 +76,7 @@ Make sure you enter all the required fields.
 | Field | Information|
 | ----- | ---------- |
 | IP address | Enter the IP address of your TV (see instructions above how to find the IP address, also make sure it is static) |
-| Pre-shared key | Enter the Pre-shared key here (default is sony) |
+| Pre-shared key | Enter "Cookie" here (without quotes) |
 | MAC address | Enter the MAC address of your TV (see instructions above how to find the MAC address). If you have an Android TV you can enter 'Android' (without quotes) in the MAC field. This way the plugin will use another method to switch on the TV. |
 | Volume bar | Option to enable or disable a Domoticz device for the volume bar, this can be used to control the volume of the TV, but only for the built-in speakers of the TV |
 | Update interval | Enter the update interval in seconds, this determines with which interval the plugin polls the TV (must be between 10 and 30 seconds) |
