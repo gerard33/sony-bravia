@@ -1,3 +1,5 @@
+*This plugin is no longer maintained.*
+
 # Sony Bravia TV - Domoticz Python plugin
 **Domoticz Python plugin for Sony Bravia TV**
 
